@@ -58,7 +58,7 @@ jobs:
           ref: ${{ github.ref }}
           check-name: 'Push Docker image to Docker Hub'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 5
+          wait-interval: 30
       - uses: actions/checkout@v2
       - name: Test with pytest
         run: |
