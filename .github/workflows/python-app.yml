@@ -48,7 +48,6 @@ jobs:
             TARGET: armv7-unknown-linux-musleabihf
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
-          - os: windows-2019
     # runs within your Docker container
     container:
       image: docker://mattforge/python-fibonacci-actions:master
