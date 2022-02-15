@@ -24,29 +24,29 @@ jobs:
           password: ${{secrets.DOCKER_PASSWORD}}
 
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v3.6.2
-        with:
+      - id: meta
+      - uses: docker/metadata-action@v3.6.2
+      - with:
           images: mattforge/python-fibonacci-actions
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2.9.0
-        with:
+      - uses: docker/build-push-action@v2.9.0
+      - with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-#  build_container_and_test:
-#    name: Pytest in Pipenv
-#    # runs on the latest Ubuntu
-#    runs-on: ubuntu-latest
-#    # runs within your Docker container
-#    container:
-#      image: docker://mattforge/python-fibonacci-actions:latest
-#    # checkout your code from your repository
-#    # and runs pytest in your pipenv environment
-#    steps:
-#      - name: Test with pytest
-#      - uses: actions/checkout@v2
-#        run: |
-#          pipenv run pytest fibonacci.py
+  build_container_and_test:
+    name: Pytest in Pipenv
+    # runs on the latest Ubuntu
+    runs-on: ubuntu-latest
+    # runs within your Docker container
+    container:
+      image: docker://mattforge/python-fibonacci-actions:latest
+    # checkout your code from your repository
+    # and runs pytest in your pipenv environment
+    steps:
+      - name: Test with pytest
+      - uses: actions/checkout@v2
+      - run: |
+          pipenv run pytest fibonacci.py
