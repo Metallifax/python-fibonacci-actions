@@ -10,27 +10,42 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  push_to_registry:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest fibonacci.py
+      - name: Check out the repo
+      - uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+      - uses: docker/login-action@v1.12.0
+      - with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3.6.2
+        with:
+          images: mattforge/python-fibonacci-actions
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2.9.0
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  build_container_and_test:
+    name: Pytest in Pipenv
+    # runs on the latest Ubuntu
+    runs-on: ubuntu-latest
+    # runs within your Docker container
+    container:
+      image: docker://mattforge/python-fibonacci-actions:latest
+    # checkout your code from your repository
+    # and runs pytest in your pipenv environment
+    steps:
+      - name: Test with pytest
+        run: |
+          pipenv run pytest fibonacci.py
